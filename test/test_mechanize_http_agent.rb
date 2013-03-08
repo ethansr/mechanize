@@ -511,8 +511,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
   def test_request_cookies
     uri = URI.parse 'http://host.example.com'
-    Mechanize::Cookie.parse uri, 'hello=world domain=.example.com' do |cookie|
-      @agent.cookie_jar.add uri, cookie
+    HTTP::Cookie.parse 'hello=world domain=.example.com', :origin => uri do |cookie|
+      @agent.cookie_jar.add cookie
     end
 
     @agent.request_cookies @req, uri
@@ -523,8 +523,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
   def test_request_cookies_many
     uri = URI.parse 'http://host.example.com'
     cookie_str = 'a=b domain=.example.com, c=d domain=.example.com'
-    Mechanize::Cookie.parse uri, cookie_str do |cookie|
-      @agent.cookie_jar.add uri, cookie
+    HTTP::Cookie.parse cookie_str, :origin => uri do |cookie|
+      @agent.cookie_jar.add cookie
     end
 
     @agent.request_cookies @req, uri
@@ -543,8 +543,8 @@ class TestMechanizeHttpAgent < Mechanize::TestCase
 
   def test_request_cookies_wrong_domain
     uri = URI.parse 'http://host.example.com'
-    Mechanize::Cookie.parse uri, 'hello=world domain=.example.com' do |cookie|
-      @agent.cookie_jar.add uri, cookie
+    HTTP::Cookie.parse 'hello=world domain=.example.com', :origin => uri do |cookie|
+      @agent.cookie_jar.add cookie
     end
 
     @agent.request_cookies @req, @uri

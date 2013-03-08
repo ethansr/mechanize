@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'forwardable'
+require 'http/cookie'
 require 'iconv' if RUBY_VERSION < '1.9.2'
 require 'mime/types'
 require 'mutex_m'
@@ -694,7 +695,7 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
   end
 
   ##
-  # A Mechanize::CookieJar which stores cookies
+  # A HTTP::CookieJar which stores cookies
 
   def cookie_jar
     @agent.cookie_jar

@@ -79,13 +79,13 @@ class Mechanize::TestCase < MiniTest::Unit::TestCase
   end
 
   ##
-  # Creates a Mechanize::CookieJar by parsing the given +str+
+  # Creates an HTTP::CookieJar by parsing the given +str+
 
   def cookie_jar str, uri = URI('http://example')
-    jar = Mechanize::CookieJar.new
+    jar = HTTP::CookieJar.new
 
-    Mechanize::Cookie.parse uri, str do |cookie|
-      jar.add uri, cookie
+    HTTP::Cookie.parse str, :origin => uri do |cookie|
+      jar.add cookie
     end
 
     jar

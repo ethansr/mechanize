@@ -130,7 +130,7 @@ class Mechanize::HTTP::Agent
     @conditional_requests     = true
     @context                  = nil
     @content_encoding_hooks   = []
-    @cookie_jar               = Mechanize::CookieJar.new
+    @cookie_jar               = HTTP::CookieJar.new
     @follow_meta_refresh      = false
     @follow_meta_refresh_self = false
     @gzip_enabled             = true
@@ -840,13 +840,11 @@ class Mechanize::HTTP::Agent
   end
 
   def save_cookies(uri, set_cookie)
+    return if set_cookie.nil?
     log = log()	 # reduce method calls
-    Mechanize::Cookie.parse(uri, set_cookie, log) { |c|
-      if @cookie_jar.add(uri, c)
-        log.debug("saved cookie: #{c}") if log
-      else
-        log.debug("rejected cookie: #{c}") if log
-      end
+    HTTP::Cookie.parse(set_cookie, :origin => uri, :logger => log) { |c|
+      @cookie_jar.add(c)
+      log.debug("saved cookie: #{c}") if log
     }
   end
 
@@ -1217,7 +1215,7 @@ class Mechanize::HTTP::Agent
   end
 
   def reset
-    @cookie_jar.clear!
+    @cookie_jar.clear
     @history.clear
   end
 
