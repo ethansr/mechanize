@@ -1283,13 +1283,13 @@ Use of #auth and #basic_auth are deprecated due to a security vulnerability.
     @history_added.call(page) if @history_added
   end
 
+  autoload :Cookie, 'mechanize/cookie'
+  autoload :CookieJar, 'mechanize/cookie_jar'
 end
 
 require 'mechanize/response_read_error'
 require 'mechanize/chunked_termination_error'
 require 'mechanize/content_type_error'
-require 'mechanize/cookie'
-require 'mechanize/cookie_jar'
 require 'mechanize/parser'
 require 'mechanize/download'
 require 'mechanize/directory_saver'
