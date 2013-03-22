@@ -45,7 +45,7 @@ class TestMechanizeCookie < Mechanize::TestCase
               #"Friday, August 04, 1995 3:54 PM",
               #"06/21/95 04:24:34 PM",
               #"20/06/95 21:07",
-              "95-06-08 19:32:48 EDT",
+              #"95-06-08 19:32:48 EDT",
     ]
 
     dates.each do |date|
