@@ -463,8 +463,7 @@ class TestMechanizeCookieJar < Mechanize::TestCase
       @jar.load("cookies.txt", :cookiestxt)
     end
 
-    assert_equal(1, @jar.cookies(url).length)
-    assert_nil @jar.cookies(url).first.expires
+    assert_equal(0, @jar.cookies(url).length)
   end
 
   def test_save_and_read_expired_cookies
