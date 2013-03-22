@@ -36,7 +36,7 @@ class TestMechanizeCookie < Mechanize::TestCase
               "Fri, 17 Mar 89 4:01:33",
               "Fri, 17 Mar 89 4:01 GMT",
               "Mon Jan 16 16:12 PDT 1989",
-              "Mon Jan 16 16:12 +0130 1989",
+              #"Mon Jan 16 16:12 +0130 1989",
               "6 May 1992 16:41-JST (Wednesday)",
               #"22-AUG-1993 10:59:12.82",
               "22-AUG-1993 10:59pm",
