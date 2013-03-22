@@ -91,7 +91,7 @@ class TestMechanizeCookie < Mechanize::TestCase
 
     Mechanize::Cookie.parse uri, cookie_str do |cookie|
       assert_equal 'quoted', cookie.name
-      assert_equal '"value"', cookie.value
+      assert_equal 'value', cookie.value
     end
   end
 
