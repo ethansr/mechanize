@@ -535,11 +535,11 @@ class TestMechanizeCookieJar < Mechanize::TestCase
       #
       # * Cookies that only match exactly the domain specified must not have a
       #   leading dot, and must have FALSE as the second field.
-      # * Cookies that match subdomains must have a leading dot, and must have
+      # * Cookies that match subdomains may have a leading dot, and must have
       #   TRUE as the second field.
       cookies_txt = File.readlines("cookies.txt")
       assert_equal(1, cookies_txt.grep( /^rubyforge\.org\tFALSE/ ).length)
-      assert_equal(1, cookies_txt.grep( /^\.rubyforge\.org\tTRUE/ ).length)
+      assert_equal(1, cookies_txt.grep( /^\.?rubyforge\.org\tTRUE/ ).length)
     end
 
     assert_equal(2, @jar.cookies(top_url).length)
