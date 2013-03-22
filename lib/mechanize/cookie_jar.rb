@@ -1,48 +1,60 @@
-if defined?(Mechanize::Error)
-  # via autoload
-  raise NameError, 'Mechanize::CookieJar has been replaced with HTTP::CookieJar.  Please migrate to HTTP::Cookie and HTTP::CookieJar.'
-else
-  raise LoadError, 'mechanize/cookie_jar has been replaced with the http-cookie gem.  Please migrate to HTTP::CookieJar and HTTP::Cookie.'
-end
+warn 'mechanize/cookie_jar is deprecated.  Please migrate to http/cookie_jar.' if $VERBOSE
 
-# # Mechanize::CookieJar will be replaced with HTTP::CookieJar soon.
-# class Mechanize::CookieJar < ::HTTP::CookieJar
-#   def __deprecated__(message = nil)
-#     warn '%s is deprecated.  Use %s%s.' % [
-#       self.class, self.class.supersclass, message ? ' and ' << message : ''
-#     ] if $VERBOSE
-#   end
-#   private :__deprecated__
-#
-#   # See HTTP::CookieJar#add and HTTP::CookieJar#origin.
-#   def add(uri, cookie)
-#     __deprecated__ 'replace #%s(uri, cookie) with #add(cookie)' % __method__
-#     super cookie.dup.tap { |ncookie|
-#       begin
-#         ncookie.origin = uri
-#       rescue
-#         return nil
-#       end
-#     }
-#   end
-#
-#   # See HTTP::CookieJar#add.
-#   def add!(cookie)
-#     __deprecated__ 'replace #%s with #add' % __method__
-#     cookie.domain.nil? and raise NoMethodError, 'raised for compatibility'
-#     @store.add(cookie)
-#     self
-#   end
-#
-#   # See HTTP::CookieJar#save.
-#   def save_as(filename, *options)
-#     __deprecated__ 'replace #%s with #save' % __method__
-#     save(filename, *options)
-#   end
-#
-#   # See HTTP::CookieJar#clear.
-#   def clear!
-#     __deprecated__ 'replace #%s with #clear' % __method__
-#     clear
-#   end
-# end
+require 'http/cookie_jar'
+require 'mechanize/cookie'
+
+class Mechanize
+  module CookieJarIMethods
+    include CookieDeprecated
+
+    def add(arg1, arg2 = nil)
+      if arg2
+        __deprecated__ 'add and origin='
+        super arg2.dup.tap { |ncookie|
+          begin
+            ncookie.origin = arg1
+          rescue
+            return nil
+          end
+        }
+      else
+        super arg1
+      end
+    end
+
+    # See HTTP::CookieJar#add.
+    def add!(cookie)
+      __deprecated__ :add
+      cookie.domain.nil? and raise NoMethodError, 'raised for compatibility'
+      @store.add(cookie)
+      self
+    end
+
+    # See HTTP::CookieJar#save.
+    def save_as(filename, *options)
+      __deprecated__ :save
+      save(filename, *options)
+    end
+
+    # See HTTP::CookieJar#clear.
+    def clear!
+      __deprecated__ :clear
+      clear
+    end
+  end
+
+  CookieJar = ::HTTP::CookieJar
+
+  # Compatibility for Ruby 1.8/1.9
+  unless CookieJar.respond_to?(:prepend, true)
+    require 'mechanize/prependable'
+
+    class CookieJar
+      extend Prependable
+    end
+  end
+
+  class CookieJar
+    prepend CookieJarIMethods
+  end
+end
