@@ -130,7 +130,7 @@ class Mechanize::HTTP::Agent
     @conditional_requests     = true
     @context                  = nil
     @content_encoding_hooks   = []
-    @cookie_jar               = HTTP::CookieJar.new
+    @cookie_jar               = Mechanize::CookieJar.new # HTTP::CookieJar.new
     @follow_meta_refresh      = false
     @follow_meta_refresh_self = false
     @gzip_enabled             = true

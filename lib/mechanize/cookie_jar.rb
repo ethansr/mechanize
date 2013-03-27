@@ -50,11 +50,64 @@ class Mechanize
     end
   end
 
-  CookieJar = ::HTTP::CookieJar
+  class CookieJar < ::HTTP::CookieJar
+    def save(filename, *options)
+      opthash = {
+        :format => :yaml,
+        :session => false,
+      }
+      case options.size
+      when 0
+      when 1
+        case options = options.first
+        when Symbol
+          opthash[:format] = options
+        else
+          opthash.update(options) if options
+        end
+      when 2
+        opthash[:format], options = options
+        opthash.update(options) if options
+      else
+        raise ArgumentError, 'wrong number of arguments (%d for 1-3)' % (1 + options.size)
+      end
 
-  class CookieJar
-    module YAMLSaverIMethods
-      def load(io, jar)
+      return super if opthash[:format] != :yaml
+
+      session = opthash[:session]
+      nstore = HashStore.new
+
+      each { |cookie|
+        next if !session && cookie.session?
+
+        if max_age = cookie.max_age
+          cookie = cookie.dup
+          cookie.expires = cookie.expires # convert max_age to expires
+        end
+        nstore.add(cookie)
+      }
+
+      yaml = YAML.dump(nstore.instance_variable_get(:@jar))
+
+      # a gross hack
+      yaml.gsub!(%r{^(    [^ ].*: !ruby/object:)HTTP::Cookie$}) {
+        $1 + 'Mechanize::Cookie'
+      }
+      yaml.gsub!(%r{^(      expires: )(.+)?$}) {
+        $1 + ($2 ? Time.parse($2).httpdate : '')
+      }
+
+      open(filename, 'w') { |io|
+        io.write yaml
+      }
+
+      self
+    end
+
+    def load(filename, format = :yaml)
+      return super if format != :yaml
+
+      open(filename) { |io|
         begin
           data = YAML.load(io)
         rescue ArgumentError
@@ -64,14 +117,15 @@ class Mechanize
 
         case data
         when Array
+          # Forward compatibility
           data.each { |cookie|
-            jar.add(cookie)
+            add(cookie)
           }
         when Hash
           data.each { |domain, paths|
             paths.each { |path, names|
               names.each { |cookie_name, cookie|
-                jar.add(cookie)
+                add(cookie)
               }
             }
           }
@@ -79,28 +133,20 @@ class Mechanize
           @logger.warn "incompatible YAML cookie data discarded" if @logger
           return
         end
-      end
+      }
     end
   end
 
   # Compatibility for Ruby 1.8/1.9
-  unless CookieJar.respond_to?(:prepend, true)
+  unless ::HTTP::CookieJar.respond_to?(:prepend, true)
     require 'mechanize/prependable'
 
-    class CookieJar
+    class ::HTTP::CookieJar
       extend Prependable
-
-      class YAMLSaver
-        extend Prependable
-      end
     end
   end
 
-  class CookieJar
+  class ::HTTP::CookieJar
     prepend CookieJarIMethods
-
-    class YAMLSaver
-      prepend YAMLSaverIMethods
-    end
   end
 end
