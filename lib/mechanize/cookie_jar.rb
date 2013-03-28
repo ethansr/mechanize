@@ -93,7 +93,7 @@ class Mechanize
       yaml.gsub!(%r{^(    [^ ].*: !ruby/object:)HTTP::Cookie$}) {
         $1 + 'Mechanize::Cookie'
       }
-      yaml.gsub!(%r{^(      expires: )(.+)?$}) {
+      yaml.gsub!(%r{^(      expires: )(?:|!!null|(.+?)) *$}) {
         $1 + ($2 ? Time.parse($2).httpdate : '')
       }
 
